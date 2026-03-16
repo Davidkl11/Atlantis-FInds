@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FINDS OF ATLANTIS — AI Fashion Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F5F0E8;
+    --ivory: #FAF7F2;
+    --charcoal: #1C1C1A;
+    --warm-gray: #8A8880;
+    --gold: #B8965A;
+    --gold-light: #D4AF7A;
+    --border: #DDD8CE;
+    --error: #C0392B;
+  }
+
+  body {
+    background: var(--ivory);
+    color: var(--charcoal);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    color: var(--charcoal);
+  }
+
+  .logo span {
+    color: var(--gold);
+  }
+
+  .tagline {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--warm-gray);
+    text-transform: uppercase;
+  }
+
+  /* Upload zone */
+  .upload-section {
+    margin-bottom: 48px;
+  }
+
+  .upload-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .drop-zone {
+    border: 1px solid var(--border);
+    background: var(--cream);
+    padding: 0;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--gold);
+    background: #F2EBE0;
+  }
+
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .drop-inner {
+    text-align: center;
+    pointer-events: none;
+    padding: 48px;
+  }
+
+  .drop-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 20px;
+    opacity: 0.3;
+  }
+
+  .drop-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+  }
+
+  .drop-sub {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--warm-gray);
+    text-transform: uppercase;
+  }
+
+  .preview-wrap {
+    display: none;
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    position: relative;
+  }
+
+  .preview-wrap.visible { display: block; }
+
+  .preview-wrap img {
+    width: 100%;
+    max-height: 480px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .preview-overlay {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(28,28,26,0.7);
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    padding: 6px 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    pointer-events: all;
+    border: none;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .preview-overlay:hover { background: var(--charcoal); }
+
+  /* Analyse button */
+  .analyse-btn {
+    width: 100%;
+    background: var(--charcoal);
+    color: var(--cream);
+    border: none;
+    padding: 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 16px;
+    display: none;
+  }
+
+  .analyse-btn:hover { background: #2C2C28; }
+  .analyse-btn:active { transform: scale(0.99); }
+  .analyse-btn.visible { display: block; }
+  .analyse-btn:disabled {
+    background: var(--warm-gray);
+    cursor: not-allowed;
+  }
+
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 48px 0;
+  }
+
+  .loading.visible { display: block; }
+
+  .loading-line {
+    width: 120px;
+    height: 1px;
+    background: var(--border);
+    margin: 0 auto 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .loading-line::after {
+    content: '';
+    position: absolute;
+    left: -40px;
+    top: 0;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    animation: scan 1.4s ease-in-out infinite;
+  }
+
+  @keyframes scan {
+    0% { left: -40px; }
+    100% { left: 120px; }
+  }
+
+  .loading-text {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--warm-gray);
+    text-transform: uppercase;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* Results */
+  .results {
+    display: none;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .results.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .result-divider span {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    white-space: nowrap;
+  }
+
+  .result-divider::before, .result-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Identification card */
+  .id-card {
+    background: var(--charcoal);
+    color: var(--cream);
+    padding: 32px 36px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .id-card::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border: 1px solid rgba(184,150,90,0.15);
+    border-radius: 50%;
+  }
+
+  .id-card::after {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 120px;
+    border: 1px solid rgba(184,150,90,0.1);
+    border-radius: 50%;
+  }
+
+  .id-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .id-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .id-item {
+    font-size: 13px;
+    color: rgba(245,240,232,0.7);
+    margin-bottom: 20px;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .id-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .id-tag {
+    border: 1px solid rgba(184,150,90,0.4);
+    color: var(--gold-light);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Where to buy grid */
+  .buy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 540px) { .buy-grid { grid-template-columns: 1fr; } }
+
+  .buy-card {
+    border: 1px solid var(--border);
+    padding: 20px 22px;
+    background: var(--cream);
+    transition: border-color 0.2s, background 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    cursor: pointer;
+  }
+
+  .buy-card:hover {
+    border-color: var(--gold);
+    background: #EEE7D9;
+  }
+
+  .buy-card-type {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .buy-card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--charcoal);
+    margin-bottom: 6px;
+  }
+
+  .buy-card-desc {
+    font-size: 10px;
+    color: var(--warm-gray);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .buy-card-link {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .buy-card-link::after {
+    content: '→';
+    transition: transform 0.2s;
+  }
+
+  .buy-card:hover .buy-card-link::after { transform: translateX(4px); }
+
+  /* Alternatives */
+  .alt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 600px) { .alt-grid { grid-template-columns: 1fr 1fr; } }
+
+  .alt-card {
+    border: 1px solid var(--border);
+    background: var(--cream);
+    padding: 18px;
+    transition: border-color 0.2s;
+  }
+
+  .alt-card:hover { border-color: var(--gold); }
+
+  .alt-tier {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .alt-tier.luxury { color: var(--gold); }
+  .alt-tier.mid { color: #7A9E7E; }
+  .alt-tier.accessible { color: #7A8E9E; }
+
+  .alt-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+  }
+
+  .alt-item {
+    font-size: 10px;
+    color: var(--warm-gray);
+    margin-bottom: 10px;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .alt-why {
+    font-size: 9px;
+    color: var(--warm-gray);
+    line-height: 1.6;
+  }
+
+  /* Stylist note */
+  .stylist-note {
+    border-left: 2px solid var(--gold);
+    padding: 20px 24px;
+    background: var(--cream);
+    margin-top: 8px;
+  }
+
+  .stylist-note p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--charcoal);
+    line-height: 1.7;
+  }
+
+  /* Error */
+  .error-msg {
+    display: none;
+    background: #FFF5F5;
+    border: 1px solid #FFCCCC;
+    padding: 16px 20px;
+    font-size: 11px;
+    color: var(--error);
+    letter-spacing: 0.05em;
+    margin-top: 16px;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* Reset */
+  .reset-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--warm-gray);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    margin-top: 32px;
+  }
+
+  .reset-btn:hover { border-color: var(--gold); color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">FINDS OF <span>ATLANTIS</span></div>
+    <div class="tagline">AI Fashion Intelligence</div>
+  </header>
+
+  <!-- Upload -->
+  <div class="upload-section">
+    <label class="upload-label">Upload garment photograph</label>
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept="image/*">
+      <div class="drop-inner" id="dropInner">
+        <svg class="drop-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 4L24 32M24 4L16 12M24 4L32 12" stroke="#1C1C1A" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8 36V42H40V36" stroke="#1C1C1A" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8 20C8 20 6 22 6 26V38H42V26C42 22 40 20 40 20" stroke="#1C1C1A" stroke-width="1" stroke-linecap="round" stroke-dasharray="3 3"/>
+        </svg>
+        <div class="drop-title">Drop your garment here</div>
+        <div class="drop-sub">or click to browse · jpg, png, webp</div>
+      </div>
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" src="" alt="Uploaded garment">
+        <button class="preview-overlay" id="changeBtn" type="button">Change image</button>
+      </div>
+    </div>
+
+    <button class="analyse-btn" id="analyseBtn">Identify &amp; Find — Analyse Garment</button>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="loading-line"></div>
+    <div class="loading-text" id="loadingText">Analysing garment...</div>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results"></div>
+
+</div>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const previewWrap = document.getElementById('previewWrap');
+const previewImg = document.getElementById('previewImg');
+const dropInner = document.getElementById('dropInner');
+const changeBtn = document.getElementById('changeBtn');
+const analyseBtn = document.getElementById('analyseBtn');
+const loading = document.getElementById('loading');
+const loadingText = document.getElementById('loadingText');
+const results = document.getElementById('results');
+const errorMsg = document.getElementById('errorMsg');
+
+let currentBase64 = null;
+
+function showPreview(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    previewImg.src = e.target.result;
+    currentBase64 = e.target.result.split(',')[1];
+    previewWrap.classList.add('visible');
+    dropInner.style.display = 'none';
+    analyseBtn.classList.add('visible');
+    results.classList.remove('visible');
+    results.innerHTML = '';
+    errorMsg.classList.remove('visible');
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) showPreview(e.target.files[0]);
+});
+
+changeBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  fileInput.value = '';
+  previewWrap.classList.remove('visible');
+  dropInner.style.display = '';
+  analyseBtn.classList.remove('visible');
+  currentBase64 = null;
+  results.classList.remove('visible');
+  results.innerHTML = '';
+});
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) showPreview(file);
+});
+
+const loadingMessages = [
+  'Analysing garment...',
+  'Identifying brand & style...',
+  'Searching luxury marketplaces...',
+  'Curating alternatives...',
+  'Finalising recommendations...'
+];
+
+let loadingInterval;
+
+function startLoading() {
+  let i = 0;
+  loadingText.textContent = loadingMessages[0];
+  loadingInterval = setInterval(() => {
+    i = Math.min(i + 1, loadingMessages.length - 1);
+    loadingText.textContent = loadingMessages[i];
+  }, 2000);
+}
+
+function stopLoading() {
+  clearInterval(loadingInterval);
+}
+
+analyseBtn.addEventListener('click', async () => {
+  if (!currentBase64) return;
+
+  analyseBtn.disabled = true;
+  loading.classList.add('visible');
+  results.classList.remove('visible');
+  results.innerHTML = '';
+  errorMsg.classList.remove('visible');
+  startLoading();
+
+  const prompt = `You are an expert luxury fashion stylist and personal shopper. Analyse this garment image and provide a detailed JSON response.
+
+Identify the clothing item — brand (if visible or inferable from style/silhouette/details), garment type, colour, material, style era, and key distinguishing features.
+
+Then provide:
+1. Where to buy (new) — 4 real websites that typically carry this type of luxury/upscale garment new
+2. Where to buy (used/pre-owned) — 4 real resale platforms for this type of item
+3. 6 alternative garments — 2 at similar luxury level, 2 at accessible luxury/mid-tier, 2 at high-street level — that share the same aesthetic/vibe
+
+Respond ONLY with valid JSON in this exact structure, no other text:
+{
+  "identified": {
+    "brand": "Brand name or 'Unidentified — appears to be [style description]'",
+    "item": "Specific item description",
+    "color": "Color description",
+    "material": "Material if visible",
+    "style": "Style/aesthetic description",
+    "tags": ["tag1", "tag2", "tag3", "tag4"]
+  },
+  "buyNew": [
+    {"name": "Site Name", "url": "https://...", "description": "Why this site for this item", "type": "Official Retailer"},
+    {"name": "Site Name", "url": "https://...", "description": "Why this site for this item", "type": "Department Store"},
+    {"name": "Site Name", "url": "https://...", "description": "Why this site for this item", "type": "Luxury Multi-brand"},
+    {"name": "Site Name", "url": "https://...", "description": "Why this site for this item", "type": "Luxury E-commerce"}
+  ],
+  "buyUsed": [
+    {"name": "Site Name", "url": "https://...", "description": "Why this resale platform for this item", "type": "Authentication Level"},
+    {"name": "Site Name", "url": "https://...", "description": "Why this resale platform", "type": "Authentication Level"},
+    {"name": "Site Name", "url": "https://...", "description": "Why this resale platform", "type": "Authentication Level"},
+    {"name": "Site Name", "url": "https://...", "description": "Why this resale platform", "type": "Authentication Level"}
+  ],
+  "alternatives": [
+    {"brand": "Brand", "item": "Item name", "tier": "luxury", "why": "Brief reason this is a great alternative"},
+    {"brand": "Brand", "item": "Item name", "tier": "luxury", "why": "Brief reason"},
+    {"brand": "Brand", "item": "Item name", "tier": "mid", "why": "Brief reason"},
+    {"brand": "Brand", "item": "Item name", "tier": "mid", "why": "Brief reason"},
+    {"brand": "Brand", "item": "Item name", "tier": "accessible", "why": "Brief reason"},
+    {"brand": "Brand", "item": "Item name", "tier": "accessible", "why": "Brief reason"}
+  ],
+  "stylistNote": "A one or two sentence elegant stylist observation about this piece and how to think about wearing or investing in it."
+}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1800,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: currentBase64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    stopLoading();
+    loading.classList.remove('visible');
+
+    if (data.error) throw new Error(data.error.message);
+
+    const rawText = data.content.map(b => b.text || '').join('');
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Could not parse response.');
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    renderResults(parsed);
+
+  } catch (err) {
+    stopLoading();
+    loading.classList.remove('visible');
+    analyseBtn.disabled = false;
+    errorMsg.textContent = 'Analysis failed: ' + (err.message || 'Please try again.');
+    errorMsg.classList.add('visible');
+  }
+});
+
+function tierLabel(tier) {
+  if (tier === 'luxury') return 'Luxury alternative';
+  if (tier === 'mid') return 'Accessible luxury';
+  return 'High-street find';
+}
+
+function renderResults(d) {
+  const id = d.identified;
+  const buyNew = d.buyNew || [];
+  const buyUsed = d.buyUsed || [];
+  const alts = d.alternatives || [];
+
+  results.innerHTML = `
+    <div class="result-divider"><span>Identification</span></div>
+
+    <div class="id-card">
+      <div class="id-label">Identified garment</div>
+      <div class="id-brand">${id.brand}</div>
+      <div class="id-item">${id.item} — ${id.color}${id.material ? ', ' + id.material : ''}</div>
+      <div class="id-tags">
+        ${(id.tags || []).map(t => `<span class="id-tag">${t}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="result-divider"><span>Where to buy — new</span></div>
+    <div class="buy-grid">
+      ${buyNew.map(s => `
+        <a class="buy-card" href="${s.url}" target="_blank" rel="noopener">
+          <div class="buy-card-type">${s.type}</div>
+          <div class="buy-card-name">${s.name}</div>
+          <div class="buy-card-desc">${s.description}</div>
+          <div class="buy-card-link">Visit site</div>
+        </a>
+      `).join('')}
+    </div>
+
+    <div class="result-divider"><span>Pre-owned &amp; resale</span></div>
+    <div class="buy-grid">
+      ${buyUsed.map(s => `
+        <a class="buy-card" href="${s.url}" target="_blank" rel="noopener">
+          <div class="buy-card-type">${s.type}</div>
+          <div class="buy-card-name">${s.name}</div>
+          <div class="buy-card-desc">${s.description}</div>
+          <div class="buy-card-link">Visit site</div>
+        </a>
+      `).join('')}
+    </div>
+
+    <div class="result-divider"><span>Alternatives &amp; similar aesthetic</span></div>
+    <div class="alt-grid">
+      ${alts.map(a => `
+        <div class="alt-card">
+          <div class="alt-tier ${a.tier}">${tierLabel(a.tier)}</div>
+          <div class="alt-brand">${a.brand}</div>
+          <div class="alt-item">${a.item}</div>
+          <div class="alt-why">${a.why}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    ${d.stylistNote ? `
+      <div class="result-divider"><span>Stylist's note</span></div>
+      <div class="stylist-note"><p>${d.stylistNote}</p></div>
+    ` : ''}
+
+    <button class="reset-btn" id="resetBtn">← New search</button>
+  `;
+
+  results.classList.add('visible');
+  analyseBtn.disabled = false;
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    fileInput.value = '';
+    previewWrap.classList.remove('visible');
+    dropInner.style.display = '';
+    analyseBtn.classList.remove('visible');
+    currentBase64 = null;
+    results.classList.remove('visible');
+    results.innerHTML = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+</script>
+</body>
+</html>
