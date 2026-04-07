@@ -182,7 +182,7 @@
 
   .preview-overlay:hover { background: var(--charcoal); }
 
-  /* Analyse button */
+  /* Analyze button */
   .analyse-btn {
     width: 100%;
     background: var(--charcoal);
@@ -463,7 +463,7 @@
     transition: border-color 0.2s;
   }
 
-  .alt-card:hover { border-color: var(--gold); }
+  .alt-card:hover { border-color: var(--gold); }  .alt-card {    display: block;    text-decoration: none;    color: inherit;    cursor: pointer;  }  .alt-link {    margin-top: 10px;    font-size: 9px;    letter-spacing: 0.12em;    text-transform: uppercase;    color: var(--gold);    font-family: var(--sans);  }
 
   .alt-tier {
     font-size: 8px;
@@ -580,14 +580,14 @@
       </div>
     </div>
 
-    <button class="analyse-btn" id="analyseBtn">Identify &amp; Find — Analyse Garment</button>
+    <button class="analyse-btn" id="analyseBtn">Identify &amp; Find — Analyze Garment</button>
     <div class="error-msg" id="errorMsg"></div>
   </div>
 
   <!-- Loading -->
   <div class="loading" id="loading">
     <div class="loading-line"></div>
-    <div class="loading-text" id="loadingText">Analysing garment...</div>
+    <div class="loading-text" id="loadingText">Analyzing garment...</div>
   </div>
 
   <!-- Results -->
@@ -657,11 +657,11 @@ dropZone.addEventListener('drop', e => {
 });
 
 const loadingMessages = [
-  'Analysing garment...',
+  'Analyzing garment...',
   'Identifying brand & style...',
   'Searching luxury marketplaces...',
   'Curating alternatives...',
-  'Finalising recommendations...'
+  'Finalizing recommendations...'
 ];
 
 let loadingInterval;
@@ -696,7 +696,7 @@ analyseBtn.addEventListener('click', async () => {
   errorMsg.classList.remove('visible');
   startLoading();
 
-  const prompt = `You are an expert luxury fashion stylist and personal shopper. Analyse this garment image and provide a detailed JSON response.
+  const prompt = `You are an expert luxury fashion stylist and personal shopper. Analyze this garment image and provide a detailed JSON response.
 
 Identify the clothing item — brand (if visible or inferable from style/silhouette/details), garment type, colour, material, style era, and key distinguishing features.
 
@@ -728,12 +728,12 @@ Respond ONLY with valid JSON in this exact structure, no other text:
     {"name": "Site Name", "url": "https://...", "description": "Why this resale platform", "type": "Authentication Level"}
   ],
   "alternatives": [
-    {"brand": "Brand", "item": "Item name", "tier": "luxury", "why": "Brief reason this is a great alternative"},
-    {"brand": "Brand", "item": "Item name", "tier": "luxury", "why": "Brief reason"},
-    {"brand": "Brand", "item": "Item name", "tier": "mid", "why": "Brief reason"},
-    {"brand": "Brand", "item": "Item name", "tier": "mid", "why": "Brief reason"},
-    {"brand": "Brand", "item": "Item name", "tier": "accessible", "why": "Brief reason"},
-    {"brand": "Brand", "item": "Item name", "tier": "accessible", "why": "Brief reason"}
+    {"brand": "Brand", "item": "Item name", "tier": "luxury", "why": "Brief reason this is a great alternative", "searchUrl": "https://www.google.com/search?q=Brand+Item+name"},
+    {"brand": "Brand", "item": "Item name", "tier": "luxury", "why": "Brief reason", "searchUrl": "https://www.google.com/search?q=Brand+Item+name"},
+    {"brand": "Brand", "item": "Item name", "tier": "mid", "why": "Brief reason", "searchUrl": "https://www.google.com/search?q=Brand+Item+name"},
+    {"brand": "Brand", "item": "Item name", "tier": "mid", "why": "Brief reason", "searchUrl": "https://www.google.com/search?q=Brand+Item+name"},
+    {"brand": "Brand", "item": "Item name", "tier": "accessible", "why": "Brief reason", "searchUrl": "https://www.google.com/search?q=Brand+Item+name"},
+    {"brand": "Brand", "item": "Item name", "tier": "accessible", "why": "Brief reason", "searchUrl": "https://www.google.com/search?q=Brand+Item+name"}
   ],
   "stylistNote": "A one or two sentence elegant stylist observation about this piece and how to think about wearing or investing in it."
 }`;
@@ -830,10 +830,10 @@ function renderResults(d) {
       `).join('')}
     </div>
 
-    <div class="result-divider"><span>Alternatives &amp; similar aesthetic</span></div>
+    <div class="result-divider"><span>Alternatives &amp; similar aesthetics</span></div>
     <div class="alt-grid">
       ${alts.map(a => `
-        <div class="alt-card">
+        <a class="alt-card" href="${a.searchUrl || 'https://www.google.com/search?q=' + encodeURIComponent(a.brand + ' ' + a.item)}" target="_blank" rel="noopener">
           <div class="alt-tier ${a.tier}">${tierLabel(a.tier)}</div>
           <div class="alt-brand">${a.brand}</div>
           <div class="alt-item">${a.item}</div>
