@@ -608,6 +608,16 @@ const loadingText = document.getElementById('loadingText');
 const results = document.getElementById('results');
 const errorMsg = document.getElementById('errorMsg');
 
+// Persist API key in localStorage so user doesn't re-enter every session
+const apiKeyInput = document.getElementById('apiKeyInput');
+const savedApiKey = localStorage.getItem('atlantis_api_key');
+if (savedApiKey) apiKeyInput.value = savedApiKey;
+apiKeyInput.addEventListener('input', () => {
+  const v = apiKeyInput.value.trim();
+  if (v) localStorage.setItem('atlantis_api_key', v);
+  else localStorage.removeItem('atlantis_api_key');
+});
+
 let currentBase64 = null;
 let currentMediaType = 'image/jpeg';
 
