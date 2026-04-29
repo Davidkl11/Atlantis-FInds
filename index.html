@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+h<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -717,8 +717,14 @@ analyseBtn.addEventListener('click', async () => {
 WORKFLOW:
 1. Identify the garment (brand, item name, color, material, style).
 2. Search the web for the item at major retailers. For buyNew, search e.g. "Brand Item site:bergdorfgoodman.com", "Brand Item site:saks.com", "Brand Item site:net-a-porter.com", "Brand Item site:ssense.com", "Brand Item site:farfetch.com", "Brand Item site:nordstrom.com", or the brand’s own site. For buyUsed, search "Brand Item site:therealreal.com", "Brand Item site:vestiairecollective.com", "Brand Item site:grailed.com", "Brand Item site:fashionphile.com", "Brand Item site:rebag.com", "Brand Item site:ebay.com".
-3. Only include a "where to buy" entry if the search returned an actual product or listing page (not a 404, not a homepage, not a category page with zero results). Use the EXACT URL from the search result.
-4. If a retailer has no real listing, skip it and use a different retailer.
+3. Only include a "where to buy" entry if the search returned an actual product or listing page (not a 404, not a homepage, not a category page with zero results). For NEW retailers (Bergdorf Goodman, Saks, Net-a-Porter, SSENSE, Farfetch, Nordstrom, brand sites): use the EXACT product URL from the search result. For PRE-OWNED / RESALE retailers (The RealReal, Vestiaire Collective, Grailed, Fashionphile, Rebag, eBay): individual listings expire when sold and product URLs frequently 404. Therefore, for resale sites do NOT use a specific listing URL. Instead, return the retailer’s STABLE SEARCH URL using these templates (replace {q} with the URL-encoded brand and item, e.g. dior%20b23):
+- The RealReal: https://www.therealreal.com/shop/search?keywords={q}
+- Vestiaire Collective: https://www.vestiairecollective.com/search/?q={q}
+- Grailed: https://www.grailed.com/shop?query={q}
+- Fashionphile: https://www.fashionphile.com/shop?keywords={q}
+- Rebag: https://shop.rebag.com/search?q={q}
+- eBay: https://www.ebay.com/sch/i.html?_nkw={q}
+4. Only include a resale retailer entry if a current search on that site is likely to return relevant results for the identified brand+item. If unsure, skip that retailer.
 
 Respond with VALID JSON ONLY (no other text, no markdown fences) in this exact shape:
 {
